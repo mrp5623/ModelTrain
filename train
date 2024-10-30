@@ -1,0 +1,53 @@
+import numpy as np
+import os
+
+from tflite_model_maker.config import QuantizationConfig
+from tflite_model_maker.config import ExportFormat
+from tflite_model_maker import model_spec
+from tflite_model_maker import object_detector
+import PIL
+
+
+import tensorflow as tf
+assert tf.__version__.startswith('2')
+
+tf.get_logger().setLevel('ERROR')
+from absl import logging
+logging.set_verbosity(logging.ERROR)
+cwd = os.getcwd()
+
+
+spec = model_spec.get('efficientdet_lite0')
+
+TRAIN_DATASET_PATH = f'{cwd}/traindata'
+VALID_DATASET_PATH = f'{cwd}/validatedata'
+TEST_DATASET_PATH = f'{cwd}/testdata'
+CLASSES = ['crown']
+
+
+
+train_data =  object_detector.DataLoader.from_pascal_voc(
+    TRAIN_DATASET_PATH,
+    TRAIN_DATASET_PATH,
+    CLASSES
+)
+validation_data = object_detector.DataLoader.from_pascal_voc(
+    VALID_DATASET_PATH,
+    VALID_DATASET_PATH,
+    CLASSES
+)
+test_data =  object_detector.DataLoader.from_pascal_voc(
+    TEST_DATASET_PATH,
+    TEST_DATASET_PATH,
+    CLASSES
+)
+
+
+model = object_detector.create(train_data, model_spec=spec, train_whole_model=True, batch_size = 8, epochs = 40, validation_data=validation_data)
+
+
+
+model.export(export_dir=f'{cwd}/model', tflite_filename='crown.tflite')
+
+
+

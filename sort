@@ -1,0 +1,13 @@
+import shutil
+import os
+
+folder1 = "./traindata" 
+folder2 = "./validatedata"
+
+
+
+for i in range (4719,5742, 5):
+    shutil.move(folder1 + os.path.sep + "IMG_"+ str(i) +".JPG", folder2 + os.path.sep + "IMG_"+ str(i) +".JPG")
+
+    
+
